@@ -6,7 +6,7 @@ The C0VM
 Useful information:
    c0vm-ref.txt           - Bytecode implementation reference
 
-Files you won't modify:
+Files
    lib/contracts.h     - Contracts for C
    lib/xalloc.h        - NULL-checking allocation
    lib/stack.h         - Stacks (with O(1) stack_size!)
@@ -17,8 +17,6 @@ Files you won't modify:
    lib/read_program.h  - Reading in C0 bytecode from a file
    lib/*.o             - machine-specific object files
    c0vm_main.c         - Main function - loads bytecode, handles return
-
-Files you will modify:
    c0vm.c              - Executes C0 bytecode
 
 ==========================================================
@@ -37,16 +35,3 @@ Compiling and running your C0VM implementation (without -DDEBUG)
    % ./c0vm tests/iadd.bc0
 
 ==========================================================
-
-Submitting from the command line on andrew (CHECKPOINT):
-   % autolab122 handin c0vmcheck c0vm.c
-then display autolab's feedback by running:
-   % autolab122 feedback c0vmcheck
-
-Submitting from the command line on andrew (FINAL):
-   % autolab122 handin c0vm c0vm.c
-then display autolab's feedback by running:
-   % autolab122 feedback
-
-Creating a tarball to submit with autolab.autolab.cmu.edu web interface:
-   % tar -czvf handin.tgz c0vm.c
