@@ -1,0 +1,78 @@
+bool even(void* x)
+//@requires \hastag(int*, x);
+{
+    if (x == NULL) return false;
+    int* i = (int*) x;
+    if (*i % 2 != 0 || *i < 0) return false;
+
+    return true;
+}
+
+bool odd(void* x)
+//@requires \hastag(int*, x);
+{
+    if (x == NULL) return true;
+    int* i = (int*) x;
+    if (*i % 2 == 0 || *i < 0) return false;
+
+    return true;
+}
+
+bool incr(void* x)
+//@requires \hastag(int*, x);
+{
+    if (x != NULL)
+    {
+        int* i = (int*) x;
+        (*i)++;
+    }
+
+    return true;
+}
+
+void* find_negative(void* accum, void* x)
+//@requires \hastag(int*, x) || x == NULL;
+//@requires \hastag(int*, accum) || accum == NULL;
+//@ensures \hastag(int*, \result);
+{
+    if (x == NULL) return accum;
+    if (x != NULL && accum == NULL) {
+
+        int* ix = (int*) x;
+        if (*ix < 0) accum = x;
+
+    }
+
+    //@assert accum == NULL || *((int*) accum) < 0;
+    
+    return accum;
+
+}
+
+void* copy(void* accum, void* x)
+//@requires \hastag(queue_t, accum);
+//@ensures \hastag(queue_t, \result);
+{
+    enq((queue_t)accum, x);
+    return accum;
+}
+
+void* insert(void* a, void* b)
+//@requires a != NULL && \hastag(int*, a);
+//@requires b != NULL && \hastag(int*, b);
+//@ensures \result != NULL && \hastag(int*, \result);
+{
+    int val_a = *((int*) a);
+    int val_b = *((int*) b);
+
+    if (val_b > val_a)
+    {
+        *((int*)a) = val_b;
+        *((int*)b) = val_a;
+    }
+
+    return a;
+}
+
+
+

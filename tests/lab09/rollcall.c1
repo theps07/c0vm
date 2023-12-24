@@ -1,0 +1,110 @@
+#use <string>
+
+struct student_info {
+  /* WRITE ME */
+  string andrew_id; // Key
+  int days_present;
+  int days_absent;
+};
+
+// typedef ______________ ____________;  // WRITE ME
+typedef struct student_info student;
+
+// Makes a string* out of a string
+string* make_key(string s)
+//@ensures \result != NULL;
+{
+  string* S = alloc(string);
+  *S = s;
+  return S;
+}
+
+// LCG hash of strings
+int lcg_hash_string(string s) {
+  int len = string_length(s);
+  int h = 0;
+  for (int i = 0; i < len; i++) {
+    h = h + char_ord(string_charat(s, i));
+    h = 1664525 * h + 1013904223;
+  }
+  return h;
+}
+
+// entry_key_fn
+key get_andrewid(entry e)
+//@requires e != NULL && \hastag(student*, e);
+//@ensures \result != NULL && \hastag(string*, \result);
+{
+  student* E = (student*) e;
+  string* K = make_key(E->andrew_id);
+  return (key) K;
+}
+
+// hash_fn
+int hash_andrewid(key k)
+//@requires k != NULL && \hastag(string*, k);
+{
+  return lcg_hash_string(*(string*)k);
+}
+
+// key_equiv_fn
+bool same_andrewid(key x, key y)
+//@requires x != NULL && \hastag(string*, x);
+//@requires y != NULL && \hastag(string*, y);
+{
+  return string_equal(*(string*)x, *(string*)y);
+}
+
+student* make_empty_student(string andrew_id)
+//@ensures string_equal(\result->andrew_id, andrew_id);
+{
+  student* s = alloc(student);
+  s->andrew_id = andrew_id;
+  s->days_present = 0;
+  s->days_absent = 0;
+  return s;
+}
+
+hdict_t new_roster(string[] andrew_ids, int len)
+//@requires \length(andrew_ids) == len;
+{
+  hdict_t H = hdict_new(len, &get_andrewid, &hash_andrewid, &same_andrewid);
+  for(int i = 0; i < len; i++)
+  {
+    student* St = make_empty_student(andrew_ids[i]);
+    hdict_insert(H, (entry) St);
+  }
+  
+  return H;
+}
+
+// ONLY LIBRARY INTERFACE FUNCTIONS MUST BE USED FOR THE FOLLOWING
+
+void mark_present(hdict_t H, string andrew_id)
+//@requires H != NULL;
+{
+  /* WRITE ME */
+  string* id = alloc(string);
+  *id = andrew_id;
+  entry e = hdict_lookup(H, (key) id);
+  student* S = (student*) e;
+  S->days_present++;
+}
+
+void mark_absent(hdict_t H, string andrew_id)
+//@requires H != NULL;
+{
+  /* WRITE ME */
+  string* id = alloc(string);
+  *id = andrew_id;
+  entry e = hdict_lookup(H, (key) id);
+  student* S = (student*) e;
+  S->days_absent++;
+}
+
+/*
+int main()
+{
+  return 0;
+}
+*/

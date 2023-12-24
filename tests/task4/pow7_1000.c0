@@ -1,0 +1,19 @@
+
+#use <conio>  
+
+int power(int base, int a) {
+    if (a != 0) return base * power(base, a-1);
+    else
+        return 1;
+}
+
+int main()
+{
+    int base = 7;
+    int a = 1000;
+
+    int result = power(7, 1000);
+    printint(result);
+    println(" is 7^1000!");
+    return 0; 
+}

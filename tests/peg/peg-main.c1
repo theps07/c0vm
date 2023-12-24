@@ -1,0 +1,56 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Peg solitaire main file
+ *
+ * 15-122 Principles of Imperative Computation
+ */
+
+#use <args>
+#use <conio>
+
+int peg_main(board B_init) {
+  print_board(B_init);
+
+  /* make copy of initial board */
+  int[] B = alloc_array(int, 8*8);
+  array_copy(B, B_init, 8*8);
+
+  stack_t Sol = stack_new(); /* start with empty solution path */
+  int final_pegs = solve(B, Sol);
+  if (final_pegs == 1) {
+    /* found solution; verify and print */
+    /* verify starting from initial position */
+    if (verify_solution(B_init, Sol)) return 0;
+    else return -1;
+  } else return final_pegs;
+}
+
+int main() {
+  int[] B_init = alloc_array(int, 8*8);
+
+  args_t args = args_parse();
+  int argc = args->argc;
+  if (argc == 0) {
+    printf("Using English board as default\n");
+    english_board(B_init);
+  } else if (argc == 1) {
+    read_board(args->argv[0], B_init, 8*8);
+  }
+
+  int ans = peg_main(B_init);
+
+  if (ans == 0) {
+    printf("Solution verified!\n");
+  } else if (ans == -1) {
+    printf("Solution check failed!\n");
+  } else {
+    printf("No solution found, closest attempt got down to ");
+    if (ans < 10) printf("  pegs.\b\b\b\b\b\b\b");
+    else          printf("   pegs.\b\b\b\b\b\b\b\b");
+  }
+
+  return ans;
+}

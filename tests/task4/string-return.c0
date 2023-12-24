@@ -1,0 +1,27 @@
+
+#use <conio>  
+#use <string>
+
+string int2string(int i)
+{
+    if (i == 0) {return "Zero";}
+    else if (i == 1) {return "One";}
+    else if (i == 2) {return "Two";}
+    else if (i == 3) {return "Three";}
+    else if (i == 4) {return "Four";}
+    else if (i == 5) {return "Five";}
+    else if (i == 6) {return "Six";}
+    else if (i == 7) {return "Seven";}
+    else if (i == 8) {return "Eight";}
+    else if (i == 9) {return "Nine";}
+
+    return "Invalid Digit!";
+}
+
+int main()
+{
+    int i = 7;
+    print(string_join(int2string(i), "\n"));
+    return 0;
+}
+

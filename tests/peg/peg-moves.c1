@@ -1,0 +1,369 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Peg solitaire solver
+ *
+ * 15-122 Principles of Imperative Computation */
+
+#use <conio>
+#use <util>
+
+// INTERFACE
+
+typedef int* move;  // Change me!
+// 32 Bit Integer representing a move
+/* Format :
+
+direction (4 bits) 
+from_row(3 bits) 
+from_col(3 bits) 
+to_row (3 bits) 
+to_col (3 bits)
+
+(0x00001000 <= *m && *m <= 0x00008FFF) 
+
+*/
+
+// Helpers
+bool isValidJump(int fr, int fc, int tr, int tc);
+int createDirectionBit(int fr, int fc, int tr, int tc);
+bool isValidDirectionBit (int d);
+bool isMove(move m);
+int direction(move m);
+
+int getBoardIdx(int row, int col);
+int getStartIdx(move m);
+int getEndIdx(move m);
+int getPrevIdx(move m);
+
+int getRowFromIdx(int idx);
+int getColFromIdx(int idx);
+
+
+bool isValidLocation (board B, move m, string s);
+
+move new_move(int from_row, int from_col, int to_row, int to_col);
+int row_start(move m);
+int col_start(move m);
+int row_end(move m);
+int col_end(move m);
+void make_move(board B, move m);
+void undo_move(board B, move m);
+
+
+// IMPLEMENTATION 
+
+bool isValidJump(int fr, int fc, int tr, int tc)
+{
+  return (0 <= fr && fr < 8 && 0 <= fc && fc < 8)
+      && (0 <= tr && tr < 8 && 0 <= tc && tc < 8)
+      && (abs(tr - fr) == 0 || abs(tr - fr) == 2) 
+      && (abs(tc - fc) == 0 || abs(tc - fc) == 2);
+}
+
+bool isValidDirectionBit(int d)
+{
+  return d == 1 || d == 2 || d == 4 || d == 8;
+}
+
+int createDirectionBit(int fr, int fc, int tr, int tc)
+//@requires isValidJump(fr, fc, tr, tc);
+//@ensures isValidDirectionBit(\result);
+{
+  int h = tr - fr;
+  int v = tc - fc;
+
+  if (h == -2 && v == 0)
+  { return 1; }              // North
+  else if (h == 2 && v == 0)
+  { return 1 << 1; }         // South
+  else if (h == 0 && v == 2)
+  { return 1 << 2; }         // East
+  else if (h == 0 && v == -2)
+  { return 1 << 3; }         // West
+
+  return 0;
+
+}
+
+bool isMove(move m)
+//@requires m != NULL;
+{
+  int d  = (*m >> 12) & 0x0000000F;
+  int fr = (*m >> 9) & 0x00000007;
+  int fc = (*m >> 6) & 0x00000007;
+  int tr = (*m >> 3) & 0x00000007;
+  int tc = *m & 0x00000007;
+
+  return (0x00001000 <= *m && *m <= 0x00008FFF) 
+        && isValidJump(fr, fc, tr, tc)
+        && isValidDirectionBit(d);
+}
+
+move new_move(int from_row, int from_col, int to_row, int to_col)
+//@requires isValidJump(from_row, from_col, to_row, to_col);
+//@ensures isMove(\result); 
+{
+  int dir = createDirectionBit(from_row, from_col, to_row, to_col) << 12;
+  int fr  = from_row << 9;
+  int fc  = from_col << 6;
+  int tr  = to_row   << 3;
+  int tc  = to_col;
+
+  move m = alloc(int);
+
+  *m = dir | fr | fc | tr | tc;
+  return m;
+}
+
+int direction(move m)
+//@requires isMove(m);
+//@ensures isValidDirectionBit(\result);
+{
+  int dir = (*m >> 12) & 0x0000000F;
+  return dir;
+}
+
+int row_start(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 8; 
+{
+  int from_row = (*m >> 9) & 0x00000007;
+  return from_row;
+}
+
+int col_start(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 8; 
+{
+  int from_col = (*m >> 6) & 0x00000007;
+  return from_col;
+}
+
+int row_end(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 8; 
+{
+  int to_row = (*m >> 3) & 0x00000007;
+  return to_row;
+}
+
+int col_end(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 8; 
+{
+  int to_col = *m & 0x00000007;
+  return to_col;
+}
+
+int getBoardIdx(int row, int col)
+//@requires 0 <= row && row < 8 && 0 <= col && col < 8;
+//@ensures 0 <= \result && \result < 64;
+{ return row * 8 + col; }
+
+int getStartIdx(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 64;
+{
+    return getBoardIdx(row_start(m), col_start(m));
+}
+
+int getEndIdx(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 64;
+{
+    return getBoardIdx(row_end(m), col_end(m));
+}
+
+int getPrevIdx(move m)
+//@requires isMove(m);
+//@ensures 0 <= \result && \result < 64;
+{
+  int dir = direction(m);
+  int target_row = row_end(m); 
+  int target_col = col_end(m);
+
+  if (dir == 1) { target_row++; }
+  else if (dir == 2) { target_row--; }
+  else if (dir == 4) { target_col--; }
+  else if (dir == 8) { target_col++; }
+
+  return getBoardIdx(target_row, target_col);
+}
+
+int getRowFromIdx(int idx)
+//@requires 0 <= idx && idx < 64;
+//@ensures 0 <= \result && \result < 8;
+{ return idx / 8; }
+
+int getColFromIdx(int idx)
+//@requires 0 <= idx && idx < 64;
+//@ensures 0 <= \result && \result < 8;
+{ return idx % 8; }
+
+move generateNorth(board B, int idx)
+//@requires 0 <= idx && idx < 64;
+//@requires is_board(B);
+//@ensures \result == NULL || isMove(\result);
+{
+  int row = getRowFromIdx(idx);
+  int col = getColFromIdx(idx);
+  if (row < 2) return NULL;
+
+  move m = new_move(row, col, row - 2, col);
+
+  if (!isValidLocation(B, m, "move")) return NULL;
+
+  return m;
+
+}
+move generateSouth(board B, int idx)
+//@requires 0 <= idx && idx < 64;
+//@requires is_board(B);
+//@ensures \result == NULL || isMove(\result);
+{
+  int row = getRowFromIdx(idx);
+  int col = getColFromIdx(idx);
+  if (row > 5) return NULL;
+
+  move m = new_move(row, col, row + 2, col);
+
+  if (!isValidLocation(B, m, "move")) return NULL;
+
+  return m;
+}
+
+
+move generateEast(board B, int idx)
+//@requires 0 <= idx && idx < 64;
+//@requires is_board(B);
+//@ensures \result == NULL || isMove(\result);
+{
+  int row = getRowFromIdx(idx);
+  int col = getColFromIdx(idx);
+  if (col > 5) return NULL;
+
+  move m = new_move(row, col, row, col + 2);
+
+  if (!isValidLocation(B, m, "move")) return NULL;
+
+  return m;
+
+}
+
+move generateWest(board B, int idx)
+//@requires 0 <= idx && idx < 64;
+//@requires is_board(B);
+//@ensures \result == NULL || isMove(\result);
+{
+  int row = getRowFromIdx(idx);
+  int col = getColFromIdx(idx);
+  if (col < 2) return NULL;
+
+  move m = new_move(row, col, row, col - 2);
+
+  if (!isValidLocation(B, m, "move")) return NULL;
+
+  return m;
+
+}
+
+
+bool isValidLocation (board B, move m, string s)
+//@requires isMove(m) && is_board(B);
+//@requires string_equal(s, "move") || string_equal(s, "undo");
+{
+
+  int start_pos = getBoardIdx(row_start(m), col_start(m));
+  int end_pos   = getBoardIdx(row_end(m), col_end(m));
+  int prev_pos  = getPrevIdx(m);
+
+  if (string_equal(s, "move"))
+  {  
+    if (B[start_pos] != 1) return false;
+    if (B[end_pos] != 0) return false;
+    if (B[prev_pos] != 1) return false;
+  }
+  else if (string_equal(s, "undo"))
+  {
+    if (B[start_pos] != 0) return false;
+    if (B[end_pos] != 1) return false;
+    if (B[prev_pos] != 0) return false;
+  }
+
+  return true;
+
+}
+
+void make_move(board B, move m)
+//@requires isMove(m) && is_board(B) && isValidLocation(B, m, "move");
+//@ensures is_board(B);
+{
+  B[getStartIdx(m)] = 0;
+  B[getEndIdx(m)] = 1;
+  B[getPrevIdx(m)] = 0;
+}
+
+void undo_move(board B, move m)
+//@requires isMove(m) && is_board(B) && isValidLocation(B, m, "undo");
+//@ensures is_board(B);
+{
+  B[getStartIdx(m)] = 1;
+  B[getEndIdx(m)] = 0;
+  B[getPrevIdx(m)] = 1;
+}
+
+void printMoves(void* m)
+//@requires \hastag(move, m);
+{
+  move mv = (move) m;
+  int dir = direction(mv);
+
+  string dirStr = "_";
+
+  if (dir == 1) {dirStr = " (North) ";}
+  else if (dir == 2) {dirStr = " (South) ";}
+  else if (dir == 4) {dirStr = " (East) ";}
+  else if (dir == 8) {dirStr = " (West) ";}
+
+  printf("(%d : %d)", row_start(mv), col_start(mv));
+  
+  if (dir == 1) { printf(" (North) ") ;}
+  else if (dir == 2) { printf(" (South) ");}
+  else if (dir == 4) { printf(" (East) ") ;}
+  else if (dir == 8) { printf(" (West) ") ;}
+  else { printf(" _ ") ;}
+
+  printf("(%d : %d)\n", row_end(mv), col_end(mv));
+}
+
+stack_t all_moves(board B)
+{
+  stack_t stk = stack_new();
+
+  for (int i = 0; i < 64; i++)
+  {
+    if (B[i] == 1)
+    {
+      void* N = (void*) generateNorth(B, i);
+      //@assert \hastag(move, N);
+      void* S = (void*) generateSouth(B, i);
+      //@assert \hastag(move, S);
+      void* E = (void*) generateEast(B, i);
+      //@assert \hastag(move, E);
+      void* W = (void*) generateWest(B, i);
+      //@assert \hastag(move, W);
+
+      if (N != NULL) push(stk, N);
+      if (W != NULL) push(stk, W);
+      if (S != NULL) push(stk, S);
+      if (E != NULL) push(stk, E);
+      
+
+    }
+  } 
+
+  return stk;
+}

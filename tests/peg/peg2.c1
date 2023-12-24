@@ -1,0 +1,147 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Peg solitaire solver
+ *
+ * 15-122 Principles of Imperative Computation */
+
+#use <conio>
+#use <util>
+#use <rand>
+
+
+struct compact_board {
+  int i1;         // First  half of a compacted board
+  int i2;         // second half of a compacted board
+  int minPegs;
+};
+typedef struct compact_board cboard;
+
+cboard* compress (board B)
+//@requires is_board(B);
+{
+  cboard* c = alloc(cboard);
+  c->i1 = 0;
+  c->i2 = 0;
+  c->minPegs = 0;
+
+  for (int i = 0; i < 64; i++)
+  {
+    int val = (B[i] == -1) ? 0 : B[i];
+    if (0 <= i && i < 32)  { c->i1 = (c->i1 << 1) | (B[i] & 1); }
+    if (32 <= i && i < 64) { c->i2 = (c->i2 << 1) | (B[i] & 1); }
+  }
+  
+  return c;
+
+}
+
+/* Client side implementation for hashtables.  See lib/hdict.o1 */
+
+int cboard_hash(key k)
+//@requires k != NULL && \hastag(cboard*, k);
+{
+  int c = 0x27d4eb2d;
+  int a = (((cboard*) k)->i1 * 17) ^ (((cboard*) k)->i1 >> 16);
+  a = ((cboard*) k)->i2 + (((cboard*) k)->i2 << 3);
+  a = ((cboard*) k)->i1 ^ (a >> 7);
+  a = ((cboard*) k)->i2 * c;
+  a = ((cboard*) k)->i1 * (a >> 15);
+  return a;
+}
+
+bool cboard_eq(key k1, key k2)
+//@requires k1 != NULL && \hastag(cboard*, k1);
+//@requires k2 != NULL && \hastag(cboard*, k2);
+{
+
+  return ((cboard*) k1)->i1 == ((cboard*) k2)->i1 
+      && ((cboard*) k1)->i2 == ((cboard*) k2)->i2 ;  // Change me!
+}
+
+key cboard_key(entry e)
+//@requires e != NULL && \hastag(cboard*, e);
+//@ensures \result != NULL && \hastag(cboard*, \result);
+{
+  return (key)((cboard*) e);
+
+}
+
+/* OPTIONAL:
+   If you would like to use pegmark, implement the following function
+   that takes a cboard and returns the corresponding hash table entry.
+   See file performance_debugging.txt for details.
+ */
+entry cboard_to_entry(cboard* c)
+// some contracts may be useful
+{
+  return (entry) c;    // Change me!
+}
+
+
+
+/*
+ * Copy here your code from peg1.c1 to continue
+ */
+
+int solve_peg(board B, stack_t Sol, int n, int m, hdict_t H)
+//@requires n == num_pegs(B) && is_board(B);
+{
+  cboard* currentBoard = compress(B);
+  entry e = hdict_lookup(H, cboard_key((entry) currentBoard));
+
+  if (e != NULL)
+  { 
+    return currentBoard->minPegs; 
+  }
+
+  int numPegs = n;
+  int minPegs = m;
+  int currMinPegs = m;
+  
+  stack_t nSol = all_moves(B);
+  
+  if (numPegs == 1) return numPegs;
+
+  if (stack_empty(nSol)) 
+  {
+    minPegs = numPegs;
+    return minPegs;
+  }
+
+  while (!stack_empty(nSol)) {
+
+    move mv = (move) pop(nSol);
+    make_move(B, mv);
+    numPegs--;
+    //printf("NumPegs : %d \n", numPegs);
+    //printf("MinPegs : %d \n", minPegs);
+    minPegs = solve_peg(B, Sol, numPegs, minPegs, H);
+    if (minPegs == 1) 
+    {
+      push(Sol, (void*) mv);
+      undo_move(B, mv);
+      return 1;
+    }
+    if (minPegs > currMinPegs)
+    { minPegs = currMinPegs; }
+    undo_move(B, mv);
+    numPegs++;
+  }
+
+  currentBoard->minPegs = minPegs;
+  hdict_insert(H, (entry) currentBoard);
+
+  return minPegs;
+
+}
+
+int solve(board B, stack_t Sol)
+//@requires is_board(B);
+{
+  int n = num_pegs(B);
+  hdict_t visitedBoards = hdict_new(33554432, &cboard_key, &cboard_hash, &cboard_eq);
+  return solve_peg(B, Sol, n, n, visitedBoards);
+}

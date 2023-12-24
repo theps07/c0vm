@@ -1,0 +1,268 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 36.34     20.41    20.41 133110964     0.00     0.00  _c0_hdict_lookup
+ 19.14     31.16    10.75 133110964     0.00     0.00  _c0_compress
+ 17.84     41.18    10.02 169684810     0.00     0.00  _c0_cboard_eq
+  6.91     45.06     3.88 1077176899     0.00     0.00  _c0_new_move
+  6.48     48.70     3.64 1077176899     0.00     0.00  _c0_isValidLocation
+  5.73     51.92     3.22 24462939     0.00     0.00  _c0_all_moves
+  3.72     54.01     2.09 1343398825     0.00     0.00  _c0_getPrevIdx
+  1.30     54.74     0.73        1     0.73    55.70  _c0_solve_peg
+  0.84     55.21     0.47                             _init
+  0.48     55.48     0.27 133110963     0.00     0.00  _c0_undo_move
+  0.34     55.67     0.19 133110963     0.00     0.00  _c0_make_move
+  0.34     55.86     0.19 22730603     0.00     0.00  _c0_hdict_insert
+  0.28     56.02     0.16 192415413     0.00     0.00  _c0_cboard_key
+  0.27     56.17     0.15 155841567     0.00     0.00  _c0_cboard_hash
+  0.00     56.17     0.00       35     0.00     0.00  _c0_check_abstract_move_is_legal
+  0.00     56.17     0.00        8     0.00     0.00  _c0_string2board
+  0.00     56.17     0.00        1     0.00    55.70  _c0_main
+  0.00     56.17     0.00        1     0.00    55.70  _c0_peg_main
+  0.00     56.17     0.00        1     0.00     0.00  _c0_print_board
+  0.00     56.17     0.00        1     0.00     0.00  _c0_read_board
+  0.00     56.17     0.00        1     0.00     0.00  _c0_solve
+  0.00     56.17     0.00        1     0.00     0.00  _c0_verify_solution
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.02% of 56.17 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     99.2    0.00   55.70                 main [1]
+                0.00   55.70       1/1           _c0_main [2]
+-----------------------------------------------
+                0.00   55.70       1/1           main [1]
+[2]     99.2    0.00   55.70       1         _c0_main [2]
+                0.00   55.70       1/1           _c0_peg_main [3]
+                0.00    0.00       1/1           _c0_read_board [32]
+-----------------------------------------------
+                0.00   55.70       1/1           _c0_main [2]
+[3]     99.2    0.00   55.70       1         _c0_peg_main [3]
+                0.73   54.97       1/1           _c0_solve_peg [4]
+                0.00    0.00       1/1           _c0_print_board [31]
+                0.00    0.00       1/1           _c0_solve [33]
+                0.00    0.00       1/1           _c0_verify_solution [34]
+-----------------------------------------------
+                             133110963             _c0_solve_peg [4]
+                0.73   54.97       1/1           _c0_peg_main [3]
+[4]     99.2    0.73   54.97       1+133110963 _c0_solve_peg [4]
+               20.41    9.28 133110964/133110964     _c0_hdict_lookup [5]
+                3.22    9.20 24462939/24462939     _c0_all_moves [6]
+               10.75    0.00 133110964/133110964     _c0_compress [7]
+                0.19    1.05 22730603/22730603     _c0_hdict_insert [12]
+                0.27    0.21 133110963/133110963     _c0_undo_move [13]
+                0.19    0.21 133110963/133110963     _c0_make_move [15]
+                             133110963             _c0_solve_peg [4]
+-----------------------------------------------
+               20.41    9.28 133110964/133110964     _c0_solve_peg [4]
+[5]     52.9   20.41    9.28 133110964         _c0_hdict_lookup [5]
+                9.02    0.00 152796863/169684810     _c0_cboard_eq [8]
+                0.13    0.00 133110964/155841567     _c0_cboard_hash [17]
+                0.13    0.00 152796863/192415413     _c0_cboard_key [16]
+-----------------------------------------------
+                3.22    9.20 24462939/24462939     _c0_solve_peg [4]
+[6]     22.1    3.22    9.20 24462939         _c0_all_moves [6]
+                3.64    1.68 1077176899/1077176899     _c0_isValidLocation [9]
+                3.88    0.00 1077176899/1077176899     _c0_new_move [10]
+-----------------------------------------------
+               10.75    0.00 133110964/133110964     _c0_solve_peg [4]
+[7]     19.1   10.75    0.00 133110964         _c0_compress [7]
+-----------------------------------------------
+                1.00    0.00 16887947/169684810     _c0_hdict_insert [12]
+                9.02    0.00 152796863/169684810     _c0_hdict_lookup [5]
+[8]     17.8   10.02    0.00 169684810         _c0_cboard_eq [8]
+-----------------------------------------------
+                3.64    1.68 1077176899/1077176899     _c0_all_moves [6]
+[9]      9.5    3.64    1.68 1077176899         _c0_isValidLocation [9]
+                1.68    0.00 1077176899/1343398825     _c0_getPrevIdx [11]
+-----------------------------------------------
+                3.88    0.00 1077176899/1077176899     _c0_all_moves [6]
+[10]     6.9    3.88    0.00 1077176899         _c0_new_move [10]
+-----------------------------------------------
+                0.21    0.00 133110963/1343398825     _c0_make_move [15]
+                0.21    0.00 133110963/1343398825     _c0_undo_move [13]
+                1.68    0.00 1077176899/1343398825     _c0_isValidLocation [9]
+[11]     3.7    2.09    0.00 1343398825         _c0_getPrevIdx [11]
+-----------------------------------------------
+                0.19    1.05 22730603/22730603     _c0_solve_peg [4]
+[12]     2.2    0.19    1.05 22730603         _c0_hdict_insert [12]
+                1.00    0.00 16887947/169684810     _c0_cboard_eq [8]
+                0.03    0.00 39618550/192415413     _c0_cboard_key [16]
+                0.02    0.00 22730603/155841567     _c0_cboard_hash [17]
+-----------------------------------------------
+                0.27    0.21 133110963/133110963     _c0_solve_peg [4]
+[13]     0.8    0.27    0.21 133110963         _c0_undo_move [13]
+                0.21    0.00 133110963/1343398825     _c0_getPrevIdx [11]
+-----------------------------------------------
+                                                 <spontaneous>
+[14]     0.8    0.47    0.00                 _init [14]
+-----------------------------------------------
+                0.19    0.21 133110963/133110963     _c0_solve_peg [4]
+[15]     0.7    0.19    0.21 133110963         _c0_make_move [15]
+                0.21    0.00 133110963/1343398825     _c0_getPrevIdx [11]
+-----------------------------------------------
+                0.03    0.00 39618550/192415413     _c0_hdict_insert [12]
+                0.13    0.00 152796863/192415413     _c0_hdict_lookup [5]
+[16]     0.3    0.16    0.00 192415413         _c0_cboard_key [16]
+-----------------------------------------------
+                0.02    0.00 22730603/155841567     _c0_hdict_insert [12]
+                0.13    0.00 133110964/155841567     _c0_hdict_lookup [5]
+[17]     0.3    0.15    0.00 155841567         _c0_cboard_hash [17]
+-----------------------------------------------
+                0.00    0.00      35/35          _c0_verify_solution [34]
+[29]     0.0    0.00    0.00      35         _c0_check_abstract_move_is_legal [29]
+-----------------------------------------------
+                0.00    0.00       8/8           _c0_read_board [32]
+[30]     0.0    0.00    0.00       8         _c0_string2board [30]
+-----------------------------------------------
+                0.00    0.00       1/1           _c0_peg_main [3]
+[31]     0.0    0.00    0.00       1         _c0_print_board [31]
+-----------------------------------------------
+                0.00    0.00       1/1           _c0_main [2]
+[32]     0.0    0.00    0.00       1         _c0_read_board [32]
+                0.00    0.00       8/8           _c0_string2board [30]
+-----------------------------------------------
+                0.00    0.00       1/1           _c0_peg_main [3]
+[33]     0.0    0.00    0.00       1         _c0_solve [33]
+-----------------------------------------------
+                0.00    0.00       1/1           _c0_peg_main [3]
+[34]     0.0    0.00    0.00       1         _c0_verify_solution [34]
+                0.00    0.00      35/35          _c0_check_abstract_move_is_legal [29]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+   [6] _c0_all_moves           [5] _c0_hdict_lookup       [33] _c0_solve
+   [8] _c0_cboard_eq           [9] _c0_isValidLocation     [4] _c0_solve_peg
+  [17] _c0_cboard_hash         [2] _c0_main               [30] _c0_string2board
+  [16] _c0_cboard_key         [15] _c0_make_move          [13] _c0_undo_move
+  [29] _c0_check_abstract_move_is_legal [10] _c0_new_move [34] _c0_verify_solution
+   [7] _c0_compress            [3] _c0_peg_main           [14] _init
+  [11] _c0_getPrevIdx         [31] _c0_print_board
+  [12] _c0_hdict_insert       [32] _c0_read_board

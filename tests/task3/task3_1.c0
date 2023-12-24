@@ -1,0 +1,9 @@
+
+int main() {
+    int i; int sum = 0;
+    for (i = 15; i <= 122; i++)
+    {
+        sum += i;
+    }
+    return sum; // Should return 7398
+}

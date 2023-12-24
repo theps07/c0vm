@@ -1,0 +1,132 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+/*
+ * Peg solitaire test file for peg-moves.c1
+ *
+ * 15-122 Principles of Imperative Computation
+ */
+
+#use <args>
+#use <conio>
+#use <util>
+
+
+
+// You are welcome to define additional helper functions for your tests
+
+
+int main() {
+  // Creating a board from file
+
+  int[] B_init = alloc_array(int, 8*8);
+
+  args_t args = args_parse();
+  int argc = args->argc;
+  if (argc == 0) {
+    printf("Using English board as default\n");
+    english_board(B_init);
+  } else if (argc == 1) {
+    read_board(args->argv[0], B_init, 8*8);
+  }
+
+  print_board(B_init);
+
+  // Using B_init, test the functions you wrote in file peg-moves.c1
+
+
+  // A sample test
+
+  int[] B = alloc_array(int, 8*8);         // make a copy (B) of B_init
+  for (int i = 0; i < 64; i++)
+    B[i] = B_init[i];
+
+  // SOME VALID MOVES
+  move move_north = new_move(7, 7, 5, 7);
+  assert(row_start(move_north) == 7);       // check that row_start works
+  assert(col_start(move_north) == 7);       // check that col_start works
+  assert(row_end(move_north)   == 5);       // check that row_end works
+  assert(col_end(move_north)   == 7);       // check that col_end works
+  assert(direction(move_north) == 1);
+
+  move move_south = new_move(0, 7, 2, 7);
+  assert(row_start(move_south) == 0);       // check that row_start works
+  assert(col_start(move_south) == 7);       // check that col_start works
+  assert(row_end(move_south)   == 2);       // check that row_end works
+  assert(col_end(move_south)   == 7);       // check that col_end works
+  assert(direction(move_south) == 2);
+
+  move move_east = new_move(0, 0, 0, 2);
+  assert(row_start(move_east) == 0);       // check that row_start works
+  assert(col_start(move_east) == 0);       // check that col_start works
+  assert(row_end(move_east)   == 0);       // check that row_end works
+  assert(col_end(move_east)   == 2);       // check that col_end works
+  assert(direction(move_east) == 4);
+
+
+  move move_west = new_move(0, 7, 0, 5);   // create a new move
+  assert(row_start(move_west) == 0);       // check that row_start works
+  assert(col_start(move_west) == 7);       // check that col_start works
+  assert(row_end(move_west)   == 0);       // check that row_end works
+  assert(col_end(move_west)   == 5);       // check that col_end works
+  assert(direction(move_west) == 8);
+  
+  print("\n");
+
+  move move_test = new_move(1, 3, 3, 3);
+  make_move(B, move_test);                // make this move                         
+                                          // print B to see the outcome
+  /* YOUR TURN */                          // using asserts, check that B
+                                           // has changed as expected
+  print_board(B);   
+  print("\n");
+
+  stack_t s = all_moves(B);
+  stack_print(s, &printMoves);
+
+
+  /*
+  move move_test2 = new_move(2, 1, 2, 3);
+  make_move(B, move_test2); 
+  print_board(B);   
+  print("\n");
+
+  move move_test3 = new_move(2, 4, 2, 2);
+  make_move(B, move_test3); 
+  print_board(B);   
+  print("\n");
+
+  move move_test4 = new_move(2, 6, 2, 4);
+  make_move(B, move_test4); 
+  print_board(B);   
+  print("\n");
+
+  undo_move(B, move_test4);
+  undo_move(B, move_test3);
+  undo_move(B, move_test2);                 // undo this move
+  undo_move(B, move_test);                 // undo this move
+  print_board(B);  
+  */
+  /* YOUR TURN */ 
+                           // print B to see the outcome
+  /*
+  for (int i = 0; i < 64; i++)             // check that B has been restored
+    assert(B[i] == B_init[i]);             // to B_init
+
+  */
+  // WRITE MORE TESTS!!!
+  // - make and undo several moves
+  // - start from different boards
+  // - ...
+
+
+
+  // Test all_moves
+
+
+
+
+  printf("All tests passed!\n");
+  return 0;
+}

@@ -1,0 +1,275 @@
+/**************************************************************************/
+/*              COPYRIGHT Carnegie Mellon University 2023                 */
+/* Do not post this file or any derivative on a public site or repository */
+/**************************************************************************/
+#use <conio>
+#use <string>
+#use <parse>
+
+// You are welcome to define helper functions for your tests
+
+queue_t string_to_queue(string S)
+{
+  char[] C = string_to_chararray(S);
+  queue_t Q = queue_new();
+  for (int i = 0; i < string_length(S); i++)
+  {
+    char* TMP = alloc(char);
+    *TMP = C[i];
+    enq(Q, (void*) TMP);
+  }
+
+  return Q;
+}
+
+string queue_to_string(queue_t Q)
+//@ensures queue_size(Q) == string_length(\result);
+{
+  char[] C = alloc_array(char, queue_size(Q)+1);
+
+  for (int i = 0; i < queue_size(Q); i++)
+  {
+    void* elem = queue_peek(Q, i);
+    //@assert \hastag(char*, elem);
+    C[i] = *((char*) elem);
+  }
+
+  C[queue_size(Q)] = '\0';
+
+  return string_from_chararray(C);
+
+}
+
+queue_t int_string_to_queue(string S)
+{
+  int[] I = parse_ints(S, 10);
+
+  queue_t Q = queue_new();
+
+  for (int i = 0; i < num_tokens(S); i++)
+  {
+    int* TMP = alloc(int);
+    *TMP = I[i];
+    enq(Q, (void*) TMP);
+  }
+  return Q;
+
+}
+
+string int_queue_to_string(queue_t Q)
+{
+  string S = "";
+
+  for(int i = 0; i < queue_size(Q); i++)
+  {
+    int* elem = (int*) deq(Q);
+    S = string_join(S, string_fromint(*elem));
+  }
+
+  return S;
+}
+
+void print_data_char(void* x)
+//@requires \hastag(char*, x);
+{
+   print(string_fromchar(*((char*)x)));
+}
+
+void print_data_int(void* x)
+//@requires \hastag(int*, x);
+{
+  printf("%d", *((int*) x));
+}
+
+bool test_queue_size(string S)
+{
+  queue_t Q = string_to_queue(S);
+  return queue_size(Q) == string_length(S);
+}
+
+bool test_queue_enq(string S1, string S2)
+{
+  string result = string_join(S1, S2);
+  queue_t Q = string_to_queue(S1);
+  char[] C = string_to_chararray(S2);
+
+  for (int i = 0; i < string_length(S2); i++)
+  {
+    char* tmp = alloc(char);
+    *tmp = C[i];
+    enq(Q, (void*) tmp);
+  }
+
+  return string_equal(queue_to_string(Q), result); 
+
+}
+
+bool test_queue_deq(string S, int n)
+//@requires n <= string_length(S);
+{
+  string result = string_sub(S, n, string_length(S));
+  queue_t Q = string_to_queue(S);
+
+  for(int i = 0; i < n; i++)
+  {
+    deq(Q);
+  }
+
+  return string_equal(result, queue_to_string(Q));
+
+}
+
+bool test_queue_peek(string S)
+{
+  queue_t Q = string_to_queue(S);
+
+  for(int i = 0; i < string_length(S); i++)
+  {
+    if(string_charat(S, i) != *((char*)queue_peek(Q, i))) return false;
+  }
+
+  return true;
+
+}
+
+bool test_queue_even(string S)
+{
+  queue_t Q = int_string_to_queue(S);
+  return queue_all(Q, &even);
+}
+
+bool test_queue_odd(string S)
+{
+  queue_t Q = int_string_to_queue(S);
+  return queue_all(Q, &odd);
+}
+
+bool test_queue_incr(string S)
+{
+  queue_t Q = int_string_to_queue(S);
+  queue_t incr_Q = int_string_to_queue(S);
+  queue_all(incr_Q, &incr);
+
+  for (int i = 0; i < queue_size(Q); i++)
+  {
+    if(*((int*) queue_peek(Q, i)) + 1 !=  *((int*) queue_peek(incr_Q, i))) return false;
+  }
+
+  return true;
+}
+
+bool test_find_negative(string S, string expected)
+{
+  
+  queue_t Q = int_string_to_queue(S);
+  int* actual = (int*) queue_iterate(Q, NULL, &find_negative); 
+  
+  if (actual == NULL && string_equal(expected, "NULL")) return true;
+  if (actual != NULL && string_equal(string_fromint(*actual), expected)) return true;
+
+  return false;
+
+}
+
+bool test_copy(string S)
+{
+  queue_t Q = int_string_to_queue(S);
+  queue_t Q_copy = (queue_t) queue_iterate(Q, (void*)queue_new(), &copy);
+
+  for (int i = 0; i < queue_size(Q); i++)
+  {
+    if(*((int*) queue_peek(Q, i)) !=  *((int*) queue_peek(Q_copy, i))) return false;
+  }
+
+  return true;
+}
+
+bool is_sorted_queue(list* start, list* end)
+{
+  if (start == NULL) return true;
+  if (start->next == NULL) return true;
+  if (*((int*)start->data) > *((int*)start->next->data)) return false;
+
+  return is_sorted_queue(start->next, end);
+}
+
+bool test_insert(string S)
+{
+  queue_t Q = int_string_to_queue(S);
+  queue_t R = queue_new();
+
+  while (queue_size(Q) > 0) {  
+    int* p1 = alloc(int);  
+    void* p2 = deq(Q);  
+    //@assert p2 != NULL && \hastag(int*, p2);  
+    *p1 = *(int*)p2;  
+    queue_iterate(R, (void*)p1, &insert);  
+    enq(R,(void*)p1);  
+  }
+
+  return is_sorted_queue(R->front, R->back);
+
+}
+
+
+
+bool test_queue_reverse(string S)
+{
+  queue_t Q = string_to_queue(S);
+  queue_reverse(Q);
+
+  for(int i = 0; i < string_length(S); i++)
+  {
+
+    if(string_charat(S, string_length(S) - i - 1) != *((char*)queue_peek(Q, i))) return false;
+    
+  }
+
+  return true;
+
+}
+
+
+
+int main() {
+  // Create a few queues
+
+  assert(test_queue_size("Hello"));
+  assert(test_queue_enq("Hello", "World!"));
+  assert(test_queue_deq("Hello", 3));
+  assert(test_queue_peek("Hello World!"));
+  assert(test_queue_reverse("Hello World!"));
+
+  assert(test_queue_even("0 2 4 6 8 10"));
+  assert(!test_queue_even("0 2 3 4 6 8"));
+  assert(!test_queue_even("0 2 10 4 6 7"));
+  assert(!test_queue_even("-2 2 10 4 6 8"));
+
+  assert(test_queue_odd("1 3 9 7 17 11"));
+  assert(!test_queue_odd("2 3 9 7 17 11"));
+  assert(!test_queue_odd("1 -3 9 7 17 11"));
+  assert(!test_queue_odd("1 3 0 7 17 11"));
+
+  assert(test_queue_incr("0 0 0 0 0 0 0 "));
+  assert(test_queue_incr("0 1 1 1 1 1 1 "));
+  assert(test_queue_incr("-1 -1 -1 -1 -1 -1 0 "));
+  assert(test_queue_incr("7 11 35 78 9 23 9"));
+
+  assert(test_find_negative("0 3 -3 5 -7 10 11", "-3"));
+  assert(test_find_negative("-7 3 -3 5 -7 10 11", "-7"));
+  assert(test_find_negative("1 3 8 5 9 10 11", "NULL"));
+  assert(test_find_negative("1 3 8 5 9 10 -9", "-9"));
+  
+  assert(test_copy("0 3 -3 5 -7 10 11"));
+  assert(test_copy("1 3 8 5 9 10 11"));
+  assert(test_copy("1 -3 9 7 17 11"));
+  assert(test_copy("1 3 0 7 17 11"));
+
+  assert(test_insert("0 3 -3 5 -7 10 11"));
+  assert(test_insert("1 3 8 5 9 10 11"));
+  assert(test_insert("1 -3 9 7 17 11"));
+  assert(test_insert("1 3 0 7 17 11"));
+
+  printf("All tests passed!\n");
+  return 0;
+}
